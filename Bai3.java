@@ -20,8 +20,11 @@ public class Bai3 {
     }
 
     public static List<Point> grahamScan(List<Point> points) {
-        if (points.size() < 3)
+        if (points.size() <= 3)
             return points;
+
+        Set<Point> uniquePoints = new HashSet<>(points);
+        points = new ArrayList<>(uniquePoints);
 
         Collections.sort(points);
         Point P0 = points.get(0);
@@ -29,15 +32,19 @@ public class Bai3 {
         points.sort((a, b) -> {
             double angleA = Math.atan2(a.y - P0.y, a.x - P0.x);
             double angleB = Math.atan2(b.y - P0.y, b.x - P0.x);
+            if (angleA == angleB)
+                return Integer.compare((a.x - P0.x) * (a.x - P0.x) + (a.y - P0.y) * (a.y - P0.y),
+                        (b.x - P0.x) * (b.x - P0.x) + (b.y - P0.y) * (b.y - P0.y));
             return Double.compare(angleA, angleB);
         });
-        Stack<Point> stack = new Stack<>();
+
+        Deque<Point> stack = new ArrayDeque<>();
         stack.push(points.get(0));
         stack.push(points.get(1));
 
         for (int i = 2; i < points.size(); i++) {
             Point top = stack.pop();
-            while (!stack.isEmpty() & crossProduct(stack.peek(), top, points.get(i)) <= 0) {
+            while (!stack.isEmpty() && crossProduct(stack.peek(), top, points.get(i)) <= 0) {
                 top = stack.pop();
             }
             stack.push(top);
@@ -49,11 +56,11 @@ public class Bai3 {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        System.out.print("Nhập số điểm: ");
+        System.out.print("Nhap so diem: ");
         int n = sc.nextInt();
         List<Point> points = new ArrayList<>();
 
-        System.out.println("Nhập tọa độ các điểm (x y):");
+        System.out.println("Nhap so diem toa do");
         for (int i = 0; i < n; i++) {
             int x = sc.nextInt();
             int y = sc.nextInt();
@@ -63,7 +70,7 @@ public class Bai3 {
 
         List<Point> hull = grahamScan(points);
 
-        System.out.println("Các điểm trên bao lồi:");
+        System.out.println("Cac diem loi: ");
         for (Point p : hull) {
             System.out.println("(" + p.x + ", " + p.y + ")");
         }
